@@ -1,8 +1,10 @@
 # widen
 
 ![MSRV](https://img.shields.io/badge/MSRV-1.71-blue)
+[![no_std](https://img.shields.io/badge/no_std-compatible-green)](https://crates.io/categories/no-std)
+[![Crates.io License](https://img.shields.io/crates/l/widen)](https://crates.io/crates/widen)
 
-Convert an enum into any type that accepts all its payload types.
+Convert an enum to any of its supersets.
 
 ```toml
 [dependencies]
@@ -24,14 +26,10 @@ assert_eq!(value, 42);
 
 The derive implements `Widen<T>` for any `T: From<u8> + From<u16>`.
 
-Pair it with [thiserror] to build error unions from ordinary enums.
-See [common patterns on docs.rs] for `thiserror` integration, backtrace capture,
-and propagation with `?`. The [derive documentation] covers explicit variant mappings.
+See the [API documentation] for common patterns like [`thiserror`] integration,
+propagation with `?`, and backtrace capture.
+The [derive documentation] covers explicit variant mappings.
 
-The runtime library is `no_std`.
-
-Licensed under either MIT or Apache-2.0, at your option.
-
-[thiserror]: https://docs.rs/thiserror
-[common patterns on docs.rs]: https://docs.rs/widen/latest/widen/#common-patterns
+[`thiserror`]: https://docs.rs/thiserror
+[API documentation]: https://docs.rs/widen/latest/widen/#common-patterns
 [derive documentation]: https://docs.rs/widen/latest/widen/derive.Widen.html#explicit-variant-mappings
