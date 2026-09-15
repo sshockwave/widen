@@ -17,8 +17,9 @@ pub use widen_derive::Widen;
 
 /// Widen a value into a destination determined by its context.
 ///
-/// Derived implementations convert an enum by its payload types. The `Result`
-/// implementation marks its error for conversion through [`Widening`].
+/// Derived enum conversions resemble subset inclusion: a destination that accepts
+/// every source payload type can subsume the source. The `Result` implementation
+/// marks its error for conversion through [`Widening`].
 ///
 /// Inclusion is a convention: arbitrary `From` implementations may transform
 /// payloads, and variants with the same payload type may become indistinguishable.

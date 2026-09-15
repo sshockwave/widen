@@ -1,7 +1,7 @@
 # widen
 
-Convert between sum types by their payloads, and propagate errors through your
-own error wrapper on stable Rust.
+Convert between Rust sum types using the idea of subset inclusion, and propagate
+errors through your own error wrapper on stable Rust.
 
 ## Convert ordinary enums
 
@@ -40,10 +40,15 @@ fn convert(error: ReadError) -> AppError {
 # }
 ```
 
+Here, `ReadError`'s payload types form a **subset** of `AppError`'s. The destination
+can **subsume** the source: `AppError` can represent every payload that `ReadError`
+carries. Widening embeds the payload in the corresponding destination variant.
+
 The derive generates only `Widen`; provide the payload `From` implementations
 yourself or use a derive such as `thiserror::Error` with `#[from]`.
-Conversions follow those implementations, so preserving payloads is a convention,
-not a property enforced by the trait.
+Subset inclusion is the model, while `From` implementations control the actual
+conversion. Preserving payloads is a convention, not a property enforced by the
+trait.
 
 ## Shorthand declarations
 
