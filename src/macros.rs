@@ -3,19 +3,25 @@
 /// A bare `ParseError` becomes `ParseError(ParseError)`. Explicit tuple and named
 /// variants are preserved, as are the enum's attributes, visibility and generics.
 /// This macro generates only the enum; apply derives and conversions as usual.
+/// It is available with `default-features = false`.
 ///
 /// ```
 /// struct ParseError;
 ///
-/// widen::type_enum! {
+/// widen::type_enum!(
 ///     enum Error {
 ///         ParseError,
 ///         Io(std::io::Error),
 ///     }
-/// }
+/// );
 ///
 /// let error = Error::ParseError(ParseError);
 /// ```
+///
+/// Use parentheses around the input so rustfmt can format the enum. Use explicit
+/// fields for attributes such as `Io(#[from] std::io::Error)` with `thiserror`.
+/// Bare identifiers always become payload variants; use an ordinary enum for
+/// genuine unit variants, including those used with `#[subsume(...)]`.
 #[macro_export]
 macro_rules! type_enum {
     ($(#[$attr:meta])* $vis:vis enum $name:ident $($tail:tt)*) => {

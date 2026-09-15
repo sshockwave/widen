@@ -1,14 +1,16 @@
 #![forbid(unsafe_code)]
+#![doc = include_str!("../README.md")]
 
 use proc_macro::TokenStream;
-use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::Span;
+use proc_macro_crate::{crate_name, FoundCrate};
 use quote::{format_ident, quote, quote_spanned};
-use syn::{Data, DeriveInput, Error, Fields, parse_macro_input, parse_quote, spanned::Spanned};
+use syn::{parse_macro_input, parse_quote, spanned::Spanned, Data, DeriveInput, Error, Fields};
 
 mod subsume;
 
 #[proc_macro_derive(Widen, attributes(subsume))]
+/// Derive enum conversions. See the [widen API documentation](https://docs.rs/widen/latest/widen/derive.Widen.html).
 pub fn derive_widen(input: TokenStream) -> TokenStream {
     expand(parse_macro_input!(input as DeriveInput))
         .unwrap_or_else(Error::into_compile_error)

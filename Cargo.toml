@@ -1,9 +1,15 @@
 [package]
 name = "widen"
 version = "0.1.0"
-edition = "2024"
-description = "Widen sum types and propagate errors through your own error wrapper"
+edition = "2021"
+rust-version = "1.71"
+description = "Error unions and widening conversions for ordinary Rust enums"
 readme = "README.md"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/sshockwave/widen"
+keywords = ["error", "error-handling", "enum", "union", "no-std"]
+categories = ["rust-patterns", "no-std"]
+exclude = [".github/"]
 
 [workspace]
 resolver = "2"

@@ -3,12 +3,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, quote_spanned};
 use syn::{
-    Attribute, DataEnum, DeriveInput, Error, Fields, Ident, Path, PathArguments, Token,
     parenthesized,
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
     spanned::Spanned,
-    token,
+    token, Attribute, DataEnum, DeriveInput, Error, Fields, Ident, Path, PathArguments, Token,
 };
 
 struct Mapping {
@@ -93,16 +92,14 @@ pub(super) fn expand(input: &DeriveInput, data: &DataEnum) -> syn::Result<TokenS
                         "put generic arguments on the source enum",
                     ));
                 }
-                // Types do not need turbofish syntax, but enum patterns do.
+                // Keep generics on the source type; patterns infer them from the input.
                 for segment in &mut ty.segments {
                     if let PathArguments::AngleBracketed(args) = &mut segment.arguments {
                         args.colon2_token = None;
                     }
                 }
                 for segment in &mut path.segments {
-                    if let PathArguments::AngleBracketed(args) = &mut segment.arguments {
-                        args.colon2_token = Some(Default::default());
-                    }
+                    segment.arguments = PathArguments::None;
                 }
                 let key = quote!(#ty).to_string();
                 let source = sources.entry(key).or_insert_with(|| Source {
