@@ -5,7 +5,7 @@ use proc_macro::TokenStream;
 use proc_macro2::Span;
 use proc_macro_crate::{crate_name, FoundCrate};
 use quote::{format_ident, quote, quote_spanned};
-use syn::{parse_macro_input, parse_quote, spanned::Spanned, Data, DeriveInput, Error, Fields};
+use syn::{parse_macro_input, parse_quote, spanned::Spanned, Data, DeriveInput, Error};
 
 mod subsume;
 
@@ -32,14 +32,25 @@ fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
         }
     }
     let from_impls = subsume::expand(&input, data)?;
-    if !from_impls.is_empty()
-        && data
-            .variants
-            .iter()
-            .any(|variant| variant.fields.len() != 1)
-    {
-        return Ok(from_impls);
-    }
+    let variants = data
+        .variants
+        .iter()
+        .map(|variant| {
+            let mut fields = variant.fields.iter();
+            let (Some(field), None) = (fields.next(), fields.next()) else {
+                return Err(Error::new_spanned(
+                    variant,
+                    "Widen requires each variant to contain exactly one field",
+                ));
+            };
+            Ok((variant, field))
+        })
+        .collect::<syn::Result<Vec<_>>>();
+    let variants = match variants {
+        Ok(variants) => variants,
+        Err(_) if !from_impls.is_empty() => return Ok(from_impls),
+        Err(error) => return Err(error),
+    };
 
     let path = match crate_name("widen").map_err(|error| Error::new(Span::call_site(), error))? {
         FoundCrate::Itself => quote!(::widen),
@@ -66,27 +77,16 @@ fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     generics.params.push(parse_quote!(#target));
     let payload = format_ident!("__widen_payload", span = Span::mixed_site());
     let mut arms = Vec::new();
-    for variant in &data.variants {
-        if variant.fields.len() != 1 {
-            return Err(Error::new_spanned(
-                variant,
-                "Widen requires each variant to contain exactly one field",
-            ));
-        }
-        let field = variant.fields.iter().next().expect("validated field count");
+    for (variant, field) in variants {
         let ty = &field.ty;
         generics.make_where_clause().predicates.push(parse_quote!(
             #target: ::core::convert::From<#ty>
         ));
 
         let name = &variant.ident;
-        let pattern = match &variant.fields {
-            Fields::Unnamed(_) => quote!(Self::#name(#payload)),
-            Fields::Named(_) => {
-                let field = &field.ident;
-                quote!(Self::#name { #field: #payload })
-            }
-            Fields::Unit => unreachable!("validated field count"),
+        let pattern = match &field.ident {
+            Some(field) => quote!(Self::#name { #field: #payload }),
+            None => quote!(Self::#name(#payload)),
         };
         arms.push(quote_spanned! {field.span()=>
             #pattern => <#target as ::core::convert::From<#ty>>::from(#payload)
