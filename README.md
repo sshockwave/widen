@@ -1,7 +1,7 @@
 # widen
 
 ![MSRV](https://img.shields.io/badge/MSRV-1.71-blue)
-[![no_std](https://img.shields.io/badge/no_std-compatible-green)](https://crates.io/categories/no-std)
+[![no_std](https://img.shields.io/badge/no__std-compatible-green)](https://crates.io/categories/no-std)
 [![Crates.io License](https://img.shields.io/crates/l/widen)](https://crates.io/crates/widen)
 
 Convert an enum to any of its supersets.
