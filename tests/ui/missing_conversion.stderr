@@ -1,0 +1,34 @@
+error[E0277]: the trait bound `u16: From<Missing>` is not satisfied
+  --> tests/ui/missing_conversion.rs:12:12
+   |
+12 |     source.widen()
+   |            ^^^^^ the trait `From<Missing>` is not implemented for `u16`
+   |
+help: `u16` implements trait `From<T>`
+  --> $RUST/core/src/ascii/ascii_char.rs
+   |
+   = note: `From<std::ascii::Char>`
+  ::: $RUST/core/src/ascii/ascii_char.rs
+   |
+   = note: in this macro invocation
+  --> $RUST/core/src/convert/num.rs
+   |
+   = note: `From<bool>`
+  ::: $RUST/core/src/convert/num.rs
+   |
+   = note: in this macro invocation
+  ::: $RUST/core/src/convert/num.rs
+   |
+   = note: `From<u8>`
+  ::: $RUST/core/src/convert/num.rs
+   |
+   = note: in this macro invocation
+note: required for `Source` to implement `Subset<u16>`
+  --> tests/ui/missing_conversion.rs:6:6
+   |
+ 5 | #[derive(Subset)]
+   |          ------ type parameter would need to implement `Subset<u16>`
+ 6 | enum Source {
+   |      ^^^^^^
+   = help: consider manually implementing `Subset<u16>` to avoid undesired bounds
+   = note: this error originates in the macro `into_int_impl` which comes from the expansion of the macro `impl_from` (in Nightly builds, run with -Z macro-backtrace for more info)

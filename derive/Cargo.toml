@@ -1,0 +1,14 @@
+[package]
+name = "widen-derive"
+version = "0.1.0"
+edition = "2024"
+description = "Derive support for widen"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro-crate = "3"
+proc-macro2 = "1"
+quote = "1"
+syn = "2"

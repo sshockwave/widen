@@ -1,0 +1,10 @@
+error[E0282]: type annotations needed
+ --> tests/ui/unannotated_map_err.rs:9:20
+  |
+9 |     source.map_err(Subset::widen)?;
+  |                    ^^^^^^^^^^^^^ cannot infer type of the type parameter `T` declared on the trait `Subset`
+  |
+help: consider specifying a concrete type for the type parameter `T`
+  |
+9 |     source.map_err(Subset::</* Type */>::widen)?;
+  |                          ++++++++++++++

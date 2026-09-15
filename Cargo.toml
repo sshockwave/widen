@@ -2,5 +2,20 @@
 name = "widen"
 version = "0.1.0"
 edition = "2024"
+description = "Widen sum types and propagate errors through your own error wrapper"
+readme = "README.md"
+
+[workspace]
+resolver = "2"
+members = ["derive", "tests/fixtures/traced", "tests/fixtures/consumer"]
+
+[features]
+default = ["derive"]
+derive = ["dep:widen-derive"]
 
 [dependencies]
+widen-derive = { version = "0.1.0", path = "derive", optional = true }
+
+[dev-dependencies]
+thiserror = "2"
+trybuild = "1"
