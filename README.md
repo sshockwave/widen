@@ -6,9 +6,9 @@ errors through your own error wrapper on stable Rust.
 ## Convert ordinary enums
 
 For enums, `Widen<T>` means that `T` accepts every payload type in the source enum.
-`#[derive(Widen)]` generates the conversion by matching each variant and calling
-`From` on its payload. Tuple and named variants with one field are supported,
-including generic enums.
+Without `#[subsume(...)]` attributes, `#[derive(Widen)]` generates the conversion
+by matching each variant and calling `From` on its payload. Tuple and named
+variants with one field are supported, including generic enums.
 
 ```rust
 # #[cfg(feature = "derive")]
@@ -44,11 +44,71 @@ Here, `ReadError`'s payload types form a **subset** of `AppError`'s. The destina
 can **subsume** the source: `AppError` can represent every payload that `ReadError`
 carries. Widening embeds the payload in the corresponding destination variant.
 
-The derive generates only `Widen`; provide the payload `From` implementations
-yourself or use a derive such as `thiserror::Error` with `#[from]`.
+In this mode, the derive generates only `Widen`; provide the payload `From`
+implementations yourself or use a derive such as `thiserror::Error` with `#[from]`.
 Subset inclusion is the model, while `From` implementations control the actual
 conversion. Preserving payloads is a convention, not a property enforced by the
 trait.
+
+## Map variants explicitly
+
+Use `#[subsume(...)]` on destination variants to flatten source enums, including
+unit variants. The derive generates `From<A>`, `From<B>`, and so on, using an
+exhaustive match for each source. Source enums need no derive or helper macro.
+
+```rust
+# #[cfg(feature = "derive")]
+# {
+use widen::Widen;
+
+enum A {
+    Shared,
+    Exclusive,
+    Normal(u32),
+}
+
+enum B {
+    Shared,
+    Exclusive,
+    Normal(u16),
+}
+
+#[derive(Debug, PartialEq, Widen)]
+enum C {
+    #[subsume(A::Shared, B::Shared)]
+    SharedVariant,
+    #[subsume(A::Exclusive)]
+    VariantA,
+    #[subsume(B::Exclusive)]
+    VariantB,
+    #[subsume(A::Normal, from(B::Normal))]
+    Normal(u32),
+}
+
+assert_eq!(C::from(A::Shared), C::SharedVariant);
+assert_eq!(C::from(B::Exclusive), C::VariantB);
+assert_eq!(C::from(B::Normal(7)), C::Normal(7));
+# }
+```
+
+Plain mappings forward fields unchanged. `from(Source::Variant)` opts into
+`.into()` for each field of that source variant. Unit, tuple, and named variants
+are supported; source and destination must have the same field shape, including
+field names for named variants. Generic source paths and destination enums work
+with explicit bounds where payload conversions require them.
+
+Every variant of each listed source must be covered exactly once. Omitting one
+is a Rust exhaustiveness error; extra destination variants are allowed. Source
+enums marked `#[non_exhaustive]` in another crate cannot be exhaustively flattened.
+
+This mode generates incoming `From` implementations instead of an outgoing
+`Widen<T>` implementation. Use `.into()` or ordinary `?` propagation for these
+conversions. Existing payload-based `Widen` implementations do not automatically
+dispatch through them.
+
+Ordinary derives and `thiserror` attributes can be combined with `subsume`.
+For example, `#[error("{}", A::Shared)]` delegates a unit variant's display, and
+`#[from]` fields can generate additional payload conversions.
 
 ## Shorthand declarations
 

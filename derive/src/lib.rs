@@ -6,7 +6,9 @@ use proc_macro2::Span;
 use quote::{format_ident, quote, quote_spanned};
 use syn::{Data, DeriveInput, Error, Fields, parse_macro_input, parse_quote, spanned::Spanned};
 
-#[proc_macro_derive(Widen)]
+mod subsume;
+
+#[proc_macro_derive(Widen, attributes(subsume))]
 pub fn derive_widen(input: TokenStream) -> TokenStream {
     expand(parse_macro_input!(input as DeriveInput))
         .unwrap_or_else(Error::into_compile_error)
@@ -20,6 +22,21 @@ fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
             "Widen can only be derived for enums",
         ));
     };
+
+    subsume::validate_attributes(&input.attrs)?;
+    for variant in &data.variants {
+        for field in &variant.fields {
+            subsume::validate_attributes(&field.attrs)?;
+        }
+    }
+    if data.variants.iter().any(|variant| {
+        variant
+            .attrs
+            .iter()
+            .any(|attr| attr.path().is_ident("subsume"))
+    }) {
+        return subsume::expand(&input, data);
+    }
 
     let path = match crate_name("widen").map_err(|error| Error::new(Span::call_site(), error))? {
         FoundCrate::Itself => quote!(::widen),

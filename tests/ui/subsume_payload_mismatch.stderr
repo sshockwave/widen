@@ -1,0 +1,15 @@
+error[E0308]: mismatched types
+  --> tests/ui/subsume_payload_mismatch.rs:16:10
+   |
+16 | #[derive(Widen)]
+   |          ^^^^^
+   |          |
+   |          expected `Converted`, found `Payload`
+   |          arguments to this enum variant are incorrect
+   |
+note: tuple variant defined here
+  --> tests/ui/subsume_payload_mismatch.rs:20:5
+   |
+20 |     Value(Converted),
+   |     ^^^^^
+   = note: this error originates in the derive macro `Widen` (in Nightly builds, run with -Z macro-backtrace for more info)

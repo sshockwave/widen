@@ -1,0 +1,41 @@
+error: expected at least one source variant
+  --> tests/ui/subsume_invalid_attributes.rs:10:5
+   |
+10 |     #[subsume()]
+   |     ^^^^^^^^^^^^
+
+error: expected `Source::Variant`
+  --> tests/ui/subsume_invalid_attributes.rs:16:15
+   |
+16 |     #[subsume(Unit)]
+   |               ^^^^
+
+error: expected `from(Source::Variant)`
+  --> tests/ui/subsume_invalid_attributes.rs:22:15
+   |
+22 |     #[subsume(into(Source::Value))]
+   |               ^^^^
+
+error: `from(...)` requires a variant with fields
+  --> tests/ui/subsume_invalid_attributes.rs:28:20
+   |
+28 |     #[subsume(from(Source::Unit))]
+   |                    ^^^^^^^^^^^^
+
+error: source variant is already mapped
+  --> tests/ui/subsume_invalid_attributes.rs:36:15
+   |
+36 |     #[subsume(Source::Unit)]
+   |               ^^^^^^^^^^^^
+
+error: `subsume` must be placed on an enum variant
+  --> tests/ui/subsume_invalid_attributes.rs:41:1
+   |
+41 | #[subsume(Source::Unit)]
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: `subsume` must be placed on an enum variant
+  --> tests/ui/subsume_invalid_attributes.rs:48:11
+   |
+48 |     Value(#[subsume(Source::Value)] u8),
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^

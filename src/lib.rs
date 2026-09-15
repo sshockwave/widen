@@ -8,10 +8,17 @@ mod macros;
 
 use core::{fmt, marker::PhantomData};
 
-/// Derive [`trait@Widen`] for an enum whose variants each contain one payload.
+/// Derive payload widening or explicit enum conversions.
 ///
-/// The generated implementation requires the destination to implement `From`
-/// for every payload type. It does not generate those `From` implementations.
+/// Without `#[subsume(...)]`, derives [`trait@Widen`] for an enum whose variants
+/// each contain one payload. The destination must implement `From` for every
+/// payload type; those implementations are not generated.
+///
+/// With variant attributes such as `#[subsume(A::Shared, B::Shared)]`, instead
+/// generates an exhaustive `From<Source>` implementation for each listed source
+/// enum. Fields are forwarded unchanged; `#[subsume(from(A::Value))]` converts
+/// each field using `Into`. Source and destination variants must have matching
+/// field shapes. Source enums need no derive.
 #[cfg(feature = "derive")]
 pub use widen_derive::Widen;
 
