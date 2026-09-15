@@ -7,7 +7,7 @@ readme = "README.md"
 
 [workspace]
 resolver = "2"
-members = ["derive", "tests/fixtures/traced", "tests/fixtures/consumer"]
+members = ["derive"]
 
 [features]
 default = ["derive"]
