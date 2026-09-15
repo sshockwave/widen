@@ -153,8 +153,6 @@
 
 extern crate self as widen;
 
-mod macros;
-
 use core::{fmt, marker::PhantomData};
 
 /// Derive payload widening or explicit enum conversions.
