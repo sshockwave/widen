@@ -31,13 +31,14 @@ fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
             subsume::validate_attributes(&field.attrs)?;
         }
     }
-    if data.variants.iter().any(|variant| {
-        variant
-            .attrs
+    let from_impls = subsume::expand(&input, data)?;
+    if !from_impls.is_empty()
+        && data
+            .variants
             .iter()
-            .any(|attr| attr.path().is_ident("subsume"))
-    }) {
-        return subsume::expand(&input, data);
+            .any(|variant| variant.fields.len() != 1)
+    {
+        return Ok(from_impls);
     }
 
     let path = match crate_name("widen").map_err(|error| Error::new(Span::call_site(), error))? {
@@ -96,6 +97,8 @@ fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let (_, type_generics, _) = input.generics.split_for_impl();
     let (impl_generics, _, where_clause) = generics.split_for_impl();
     Ok(quote! {
+        #from_impls
+
         impl #impl_generics #path::Widen<#target> for #name #type_generics #where_clause {
             fn widen(self) -> #target {
                 match self { #(#arms,)* }

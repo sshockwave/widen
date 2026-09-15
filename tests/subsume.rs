@@ -95,6 +95,32 @@ fn question_mark_infers_the_destination() {
     assert_eq!(promote(Err(A::Exclusive)), Err(C::VariantA));
 }
 
+#[test]
+fn subsume_preserves_outgoing_payload_widening() {
+    enum Source {
+        Word(u16),
+        Named { value: u8 },
+    }
+
+    #[derive(Widen)]
+    enum Combined {
+        #[subsume(Source::Word)]
+        Word(u16),
+        #[subsume(Source::Named)]
+        Named {
+            value: u8,
+        },
+        Extra(u32),
+    }
+
+    let word: u64 = Combined::from(Source::Word(42)).widen();
+    let named: u64 = Combined::from(Source::Named { value: 7 }).widen();
+    let extra: u64 = Combined::Extra(100).widen();
+    assert_eq!(word, 42);
+    assert_eq!(named, 7);
+    assert_eq!(extra, 100);
+}
+
 mod source {
     pub enum Generic<'a, T, const N: usize> {
         Values { values: &'a [T; N] },
@@ -144,6 +170,8 @@ where
 #[test]
 fn respects_explicit_generic_conversion_bounds() {
     assert_eq!(Converted::<u32>::from(Byte::Value(7)), Converted::Value(7));
+    let value: u64 = Converted::<u32>::from(Byte::Value(7)).widen();
+    assert_eq!(value, 7);
 }
 
 #[test]

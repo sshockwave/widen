@@ -159,8 +159,8 @@ use core::{fmt, marker::PhantomData};
 
 /// Derive payload widening or explicit enum conversions.
 ///
-/// Without `#[subsume(...)]`, implements [`trait@Widen`] for the source enum.
-/// With `#[subsume(...)]`, implements [`From`] for the destination enum instead.
+/// Implements [`trait@Widen`] when every variant contains exactly one field.
+/// Independently, `#[subsume(...)]` generates incoming [`From`] implementations.
 ///
 /// # Payload widening
 ///
@@ -250,10 +250,31 @@ use core::{fmt, marker::PhantomData};
 /// - Generic source paths, such as `Source::<T>::Value`, and destination enums
 ///   are supported. Put required payload conversion bounds on the destination.
 ///
-/// Adding any `#[subsume(...)]` attribute selects this mode for the whole derive:
-/// it generates incoming `From` implementations, with no outgoing `Widen<T>`
-/// implementation. Use `.into()` or ordinary `?` for these conversions. Existing
-/// payload-based `Widen` implementations do not dispatch through them.
+/// These incoming `From` implementations are independent of outgoing payload
+/// widening. When every variant contains exactly one field, the derive generates
+/// both. Enums with unit or multiple-field variants get only the `From`
+/// implementations. Without `subsume` mappings, such variants are rejected.
+/// Use `.into()` or ordinary `?` for the mapped conversions; payload-based
+/// `Widen` implementations do not dispatch through them.
+///
+/// ```
+/// use widen::Widen;
+///
+/// enum Small {
+///     Byte(u8),
+/// }
+///
+/// #[derive(Widen)]
+/// enum Combined {
+///     #[subsume(Small::Byte)]
+///     Byte(u8),
+///     Word(u16),
+/// }
+///
+/// let combined = Combined::from(Small::Byte(42));
+/// let value: u32 = combined.widen();
+/// assert_eq!(value, 42);
+/// ```
 ///
 /// Ordinary derives and `thiserror` attributes can be combined with `subsume`.
 /// For example, `#[error("{}", A::Shared)]` delegates a unit variant's display;
