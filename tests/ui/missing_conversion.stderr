@@ -23,12 +23,12 @@ help: `u16` implements trait `From<T>`
   ::: $RUST/core/src/convert/num.rs
    |
    = note: in this macro invocation
-note: required for `Source` to implement `Subset<u16>`
+note: required for `Source` to implement `Widen<u16>`
   --> tests/ui/missing_conversion.rs:6:6
    |
- 5 | #[derive(Subset)]
-   |          ------ type parameter would need to implement `Subset<u16>`
+ 5 | #[derive(Widen)]
+   |          ----- type parameter would need to implement `Widen<u16>`
  6 | enum Source {
    |      ^^^^^^
-   = help: consider manually implementing `Subset<u16>` to avoid undesired bounds
+   = help: consider manually implementing `Widen<u16>` to avoid undesired bounds
    = note: this error originates in the macro `into_int_impl` which comes from the expansion of the macro `impl_from` (in Nightly builds, run with -Z macro-backtrace for more info)

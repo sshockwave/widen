@@ -1,16 +1,16 @@
-error: Subset requires each variant to contain exactly one field
+error: Widen requires each variant to contain exactly one field
  --> tests/ui/invalid_variants.rs:5:5
   |
 5 |     Missing,
   |     ^^^^^^^
 
-error: Subset requires each variant to contain exactly one field
+error: Widen requires each variant to contain exactly one field
   --> tests/ui/invalid_variants.rs:10:5
    |
 10 |     Pair(u32, u32),
    |     ^^^^^^^^^^^^^^
 
-error: Subset requires each variant to contain exactly one field
+error: Widen requires each variant to contain exactly one field
   --> tests/ui/invalid_variants.rs:15:5
    |
 15 |     Pair { first: u32, second: u32 },

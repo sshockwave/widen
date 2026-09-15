@@ -1,12 +1,12 @@
-use widen::Subset;
+use widen::Widen;
 
-#[derive(Subset)]
+#[derive(Widen)]
 enum Source {
     Number(u8),
 }
 
 fn convert(source: Result<(), Source>) -> Result<(), u16> {
-    source.map_err(Subset::widen)?;
+    source.map_err(Widen::widen)?;
     Ok(())
 }
 

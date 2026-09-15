@@ -1,8 +1,8 @@
-use widen::Subset;
+use widen::Widen;
 
 struct Missing;
 
-#[derive(Subset)]
+#[derive(Widen)]
 enum Source {
     Number(u8),
     Missing(Missing),

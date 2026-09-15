@@ -6,8 +6,8 @@ use proc_macro2::Span;
 use quote::{format_ident, quote, quote_spanned};
 use syn::{Data, DeriveInput, Error, Fields, parse_macro_input, parse_quote, spanned::Spanned};
 
-#[proc_macro_derive(Subset)]
-pub fn derive_subset(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(Widen)]
+pub fn derive_widen(input: TokenStream) -> TokenStream {
     expand(parse_macro_input!(input as DeriveInput))
         .unwrap_or_else(Error::into_compile_error)
         .into()
@@ -17,7 +17,7 @@ fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let Data::Enum(data) = &input.data else {
         return Err(Error::new_spanned(
             &input.ident,
-            "Subset can only be derived for enums",
+            "Widen can only be derived for enums",
         ));
     };
 
@@ -50,7 +50,7 @@ fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
         if variant.fields.len() != 1 {
             return Err(Error::new_spanned(
                 variant,
-                "Subset requires each variant to contain exactly one field",
+                "Widen requires each variant to contain exactly one field",
             ));
         }
         let field = variant.fields.iter().next().expect("validated field count");
@@ -77,7 +77,7 @@ fn expand(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let (_, type_generics, _) = input.generics.split_for_impl();
     let (impl_generics, _, where_clause) = generics.split_for_impl();
     Ok(quote! {
-        impl #impl_generics #path::Subset<#target> for #name #type_generics #where_clause {
+        impl #impl_generics #path::Widen<#target> for #name #type_generics #where_clause {
             fn widen(self) -> #target {
                 match self { #(#arms,)* }
             }

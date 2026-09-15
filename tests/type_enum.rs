@@ -46,15 +46,15 @@ fn preserves_generics_explicit_fields_and_attributes() {
 
 #[cfg(feature = "derive")]
 #[test]
-fn supports_subset_and_thiserror_derives() {
-    use widen::Subset;
+fn supports_widen_and_thiserror_derives() {
+    use widen::Widen;
 
     #[derive(Debug, thiserror::Error)]
     #[error("parse failed")]
     struct ParseError;
 
     type_enum! {
-        #[derive(Debug, thiserror::Error, Subset)]
+        #[derive(Debug, thiserror::Error, Widen)]
         enum Error {
             #[error(transparent)]
             ParseError,

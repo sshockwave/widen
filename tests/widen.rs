@@ -1,7 +1,7 @@
 #![cfg(feature = "derive")]
 
 use thiserror::Error;
-use widen::Subset;
+use widen::Widen;
 
 #[derive(Debug, Error, PartialEq)]
 #[error("invalid number: {0}")]
@@ -15,7 +15,7 @@ struct IoError(u32);
 #[error("missing configuration")]
 struct ConfigError;
 
-#[derive(Debug, Error, Subset)]
+#[derive(Debug, Error, Widen)]
 enum ReadError {
     #[error(transparent)]
     Parse(#[from] ParseError),
@@ -38,7 +38,7 @@ fn convert(error: ReadError) -> AppError {
 }
 
 fn tail_return(result: Result<(), ReadError>) -> Result<(), AppError> {
-    result.map_err(Subset::widen)
+    result.map_err(Widen::widen)
 }
 
 #[test]
@@ -64,7 +64,7 @@ fn can_widen_to_the_same_enum() {
     assert!(matches!(error, ReadError::Io(IoError(42))));
 }
 
-#[derive(Subset)]
+#[derive(Widen)]
 enum Borrowed<'a, T, const N: usize>
 where
     T: Copy + 'a,
@@ -81,7 +81,7 @@ fn supports_named_fields_lifetimes_and_const_generics() {
     assert!(std::ptr::eq(recover(&values), &values));
 }
 
-#[derive(Subset)]
+#[derive(Widen)]
 enum Collision<__WidenTarget = u32> {
     Value(__WidenTarget),
 }
@@ -94,7 +94,7 @@ fn preserves_default_generics_and_avoids_generated_name_collisions() {
     assert_eq!(recover(String::from("payload")), "payload");
 }
 
-#[derive(Subset)]
+#[derive(Widen)]
 enum Empty {}
 
 #[test]

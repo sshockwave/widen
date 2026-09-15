@@ -1,6 +1,6 @@
 #![cfg(feature = "derive")]
 
-use widen::{Subset, Widen};
+use widen::{Widen, Widening};
 
 // This integration test defines a wrapper outside the widen crate.
 #[derive(Debug, PartialEq)]
@@ -18,8 +18,8 @@ impl<E> From<E> for Traced<E> {
     }
 }
 
-impl<E: Subset<F>, F> From<Widen<Traced<E>, F>> for Traced<F> {
-    fn from(error: Widen<Traced<E>, F>) -> Self {
+impl<E: Widen<F>, F> From<Widening<Traced<E>, F>> for Traced<F> {
+    fn from(error: Widening<Traced<E>, F>) -> Self {
         let Traced { error, context } = error.into_inner();
         Self {
             error: error.widen(),
@@ -34,13 +34,13 @@ struct ParseError(&'static str);
 #[derive(Debug, PartialEq)]
 struct IoError(u32);
 
-#[derive(Subset)]
+#[derive(Widen)]
 enum ReadError {
     Parse(ParseError),
     Io(IoError),
 }
 
-// The destination needs no Subset derive or wrapper-specific conversion.
+// The destination needs no Widen derive or wrapper-specific conversion.
 #[derive(Debug, PartialEq)]
 enum AppError {
     Parse(ParseError),
@@ -69,7 +69,7 @@ fn higher(result: Result<u32, Traced<ReadError>>) -> Result<u32, Traced<AppError
     Ok(value + 1)
 }
 
-fn generic<E: Subset<F>, F>(result: Result<u32, Traced<E>>) -> Result<u32, Traced<F>> {
+fn generic<E: Widen<F>, F>(result: Result<u32, Traced<E>>) -> Result<u32, Traced<F>> {
     let value = result.widen()?;
     Ok(value + 1)
 }

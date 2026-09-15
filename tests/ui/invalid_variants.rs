@@ -1,16 +1,16 @@
-use widen::Subset;
+use widen::Widen;
 
-#[derive(Subset)]
+#[derive(Widen)]
 enum Unit {
     Missing,
 }
 
-#[derive(Subset)]
+#[derive(Widen)]
 enum Tuple {
     Pair(u32, u32),
 }
 
-#[derive(Subset)]
+#[derive(Widen)]
 enum Named {
     Pair { first: u32, second: u32 },
 }

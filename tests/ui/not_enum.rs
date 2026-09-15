@@ -1,6 +1,6 @@
-use widen::Subset;
+use widen::Widen;
 
-#[derive(Subset)]
+#[derive(Widen)]
 struct Error(u32);
 
 fn main() {}
