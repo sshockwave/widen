@@ -80,11 +80,7 @@ pub(super) fn expand(input: &DeriveInput, data: &DataEnum) -> syn::Result<TokenS
                     return Err(Error::new_spanned(path, "expected `Source::Variant`"));
                 }
                 let mut ty = path.clone();
-                let source_variant = ty
-                    .segments
-                    .pop()
-                    .expect("validated path length")
-                    .into_value();
+                let source_variant = ty.segments.pop().expect("validated path length");
                 ty.segments.pop_punct();
                 if !matches!(source_variant.arguments, PathArguments::None) {
                     return Err(Error::new_spanned(
