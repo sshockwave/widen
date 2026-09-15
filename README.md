@@ -45,6 +45,34 @@ yourself or use a derive such as `thiserror::Error` with `#[from]`.
 Conversions follow those implementations, so preserving payloads is a convention,
 not a property enforced by the trait.
 
+## Shorthand declarations
+
+`type_enum!` removes the repeated type name in variants such as
+`ParseError(ParseError)`:
+
+```rust
+# #[derive(Debug)]
+# struct ParseError;
+# #[derive(Debug)]
+# struct ConfigError;
+widen::type_enum! {
+    #[derive(Debug)]
+    enum Error {
+        ParseError,
+        ConfigError,
+        Io(std::io::Error),
+    }
+}
+```
+
+Bare identifiers expand to variants with the same name and payload type.
+Explicit tuple and named variants, generics, visibility, and attributes are
+preserved. Use explicit variants when field attributes are needed, such as
+`Io(#[from] std::io::Error)` with `thiserror`.
+
+This is syntax shorthand only: add `#[derive(Subset)]` and `From` implementations
+as usual. It is available even with derive support disabled.
+
 ## Propagate through your own error wrapper
 
 `result.map_err(Subset::widen)?` generally needs a target annotation because `?`
@@ -93,5 +121,4 @@ equation `F = Widen<Traced<E>, F>`. This uses standard `Result` and `From`, with
 custom `Try` implementation.
 
 The runtime library is `no_std`. Derive support is enabled by default and can be
-disabled with `default-features = false`. This initial API consists of `Subset`,
-its derive, and `Widen`; enum declarations remain ordinary Rust.
+disabled with `default-features = false`.

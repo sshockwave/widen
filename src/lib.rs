@@ -4,6 +4,8 @@
 
 extern crate self as widen;
 
+mod macros;
+
 use core::{fmt, marker::PhantomData};
 
 /// Derive [`trait@Subset`] for an enum whose variants each contain one payload.
