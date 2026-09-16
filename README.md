@@ -1,5 +1,6 @@
 # widen
 
+[![Crates.io Version](https://img.shields.io/crates/v/widen)](https://crates.io/crates/widen)
 ![MSRV](https://img.shields.io/badge/MSRV-1.71-blue)
 [![no_std](https://img.shields.io/badge/no__std-compatible-green)](https://crates.io/categories/no-std)
 [![Crates.io License](https://img.shields.io/crates/l/widen)](https://crates.io/crates/widen)
